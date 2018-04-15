@@ -20,6 +20,14 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->integer('questions_count')->default(0);
+            $table->integer('answers_count')->default(0);
+            $table->integer('comments_count')->default(0);
+            $table->integer('favorites_count')->default(0);
+            $table->integer('likes_count')->default(0);
+            $table->integer('followers_count')->default(0);
+            $table->integer('followings_count')->default(0);
+            $table->integer('experience_count')->default(0);
         });
     }
 

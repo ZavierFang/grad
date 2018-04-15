@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -15,7 +16,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'avatar', 'confirmation_token','api_token','setting','followers_count','followings_count',
+        'questions_count','comments_count','answers_count','likes_count'
     ];
 
     /**
@@ -26,4 +28,20 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    //是否是本对象
+    public function owns(Model $model){
+        return $this->id==$model->user_id;
+    }
+
+    //用户--问题
+    public function questions(){
+        return $this->hasMany(Question::class);
+    }
+
+    //用户--答案
+    public function answers(){
+        return $this->hasMany(Answer::class);
+    }
+
 }

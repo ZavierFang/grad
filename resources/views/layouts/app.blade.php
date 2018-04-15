@@ -11,11 +11,33 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ url('build/css/app-a9835dd9a9.css') }}" rel="stylesheet">
+    @section('header-css')
+        <link href="//cdn.bootcss.com/font-awesome/4.6.0/css/font-awesome.css" rel="stylesheet">
+        <link href="{{url('css/source/ionicons.min.css')}}" rel="stylesheet">
+        <link rel="stylesheet" href="{{url('css/source/semantic.min.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="{{url('dist/css/AdminLTE.min.css')}}">
+        <link rel="stylesheet" href="{{url('dist/css/_all-skins.min.css')}}">
+    @show
+
+<!-- Scripts -->
+    <script>
+        window.Laravel =<?php echo json_encode([
+            'csrfToken' => csrf_token(),
+        ]); ?>;
+        Laravel.apiToken = "{{Auth::check()?'Bearer '.Auth::user()->api_token:'Bearer '}}";
+        @if(Auth::check())
+            window.Zhihu = {
+            name: "{{Auth::user()->name}}",
+            avatar: "{{Auth::user()->avatar}}"
+        }
+        @endif
+    </script>
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
+        <nav class="navbar navbar-inverse navbar-static-top">
             <div class="container">
                 <div class="navbar-header">
 
@@ -36,11 +58,13 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        <li><a class="nav-link-title" href="{{url('/')}}">首页</a></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">
+                        <li class="ask-question"><a class="ui button blue" href="{{ url('/questions/create') }}"><i class="fa fa-paint-brush fa-icon-lg"></i>新闻资讯</a></li>
+                        <li class="ask-question"><a class="ui button blue" href="{{ url('/questions/create') }}"><i class="fa fa-paint-brush fa-icon-lg"></i>发帖子</a></li>
                         <!-- Authentication Links -->
                         @if (Auth::guest())
                             <li><a href="{{ route('login') }}">登录</a></li>
@@ -76,5 +100,18 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+
+    <script>
+        $('#flash-overlay-modal').modal();
+    </script>
+    <!-- 配置文件 -->
+    <script type="text/javascript" src="{{ asset('vendor/ueditor/ueditor.config.js') }}"></script>
+    <!-- 编辑器源码文件 -->
+    <script type="text/javascript" src="{{ asset('vendor/ueditor/ueditor.all.js') }}"></script>
+    <script>
+        window.UEDITOR_CONFIG.serverUrl = '{{ config('ueditor.route.name') }}'
+    </script>
+
+    @yield('js')
 </body>
 </html>

@@ -12,10 +12,10 @@
                             {{ csrf_field() }}
 
                             <div class="form-group{{ $errors->has('city') ? ' has-error' : '' }}">
-                                <label for="city" class="col-md-4 control-label">现居城市</label>
+                                <label for="city" class="col-md-4 control-label">居住地址</label>
 
                                 <div class="col-md-6">
-                                    <input id="city" type="text" class="form-control" name="city" value="{{ user()->setting['city'] }}" required>
+                                    <input id="city" type="text" class="form-control" name="city" value="{{user()->setting['city'] }}" required>
 
                                     @if ($errors->has('city'))
                                         <span class="help-block">
@@ -25,43 +25,43 @@
                                 </div>
                             </div>
 
-                            <div class="form-group{{ $errors->has('site') ? ' has-error' : '' }}">
-                                <label for="site" class="col-md-4 control-label">个人站点</label>
+                            <div class="form-group{{ $errors->has('qq') ? ' has-error' : '' }}">
+                                <label for="qq" class="col-md-4 control-label">QQ</label>
 
                                 <div class="col-md-6">
-                                    <input id="site" type="text" class="form-control" name="site" value="{{user()->setting['site']}}" required>
+                                    <input id="site" type="text" class="form-control" name="qq" value="{{user()->setting['qq']}}" required>
 
-                                    @if ($errors->has('site'))
+                                    @if ($errors->has('qq'))
                                         <span class="help-block">
-                                        <strong>{{ $errors->first('site') }}</strong>
+                                        <strong>{{ $errors->first('qq') }}</strong>
                                     </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="form-group{{ $errors->has('github') ? ' has-error' : '' }}">
-                                <label for="github" class="col-md-4 control-label">Github</label>
+                            <div class="form-group{{ $errors->has('sex') ? ' has-error' : '' }}">
+                                <label for="sex" class="col-md-4 control-label">性别</label>
 
                                 <div class="col-md-6">
-                                    <input id="github" type="text" class="form-control" name="github" value="{{user()->setting['github']}}" required>
+                                    <input id="github" type="text" class="form-control" name="sex" value="{{user()->setting['sex']}}" required>
 
-                                    @if ($errors->has('github'))
+                                    @if ($errors->has('sex'))
                                         <span class="help-block">
-                                        <strong>{{ $errors->first('github') }}</strong>
+                                        <strong>{{ $errors->first('sex') }}</strong>
                                     </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="form-group{{ $errors->has('bio') ? ' has-error' : '' }}">
-                                <label for="bio" class="col-md-4 control-label">个人简介</label>
+                            <div class="form-group{{ $errors->has('brief') ? ' has-error' : '' }}">
+                                <label for="brief" class="col-md-4 control-label">个人简介</label>
 
                                 <div class="col-md-6">
-                                    <textarea id="bio" type="text" class="form-control" name="bio" required>{{user()->setting['bio']}}</textarea>
+                                    <textarea id="bio" type="text" class="form-control" name="brief" required>{{user()->setting['brief']}}</textarea>
 
-                                    @if ($errors->has('bio'))
+                                    @if ($errors->has('brief'))
                                         <span class="help-block">
-                                        <strong>{{ $errors->first('bio') }}</strong>
+                                        <strong>{{ $errors->first('brief') }}</strong>
                                     </span>
                                     @endif
                                 </div>

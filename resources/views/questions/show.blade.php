@@ -1,3 +1,5 @@
+
+
 @extends('layouts.app')
 
 @section('content')
@@ -20,20 +22,12 @@
                                         model="{{$question->id}}"
                                         count="{{$question->comments()->count()}}">
                                     </comments>
-                                    <div class="answer-item-action">
-                                        <i class="fa fa-paper-plane fa-icon-sm"></i>
-                                        分享
-                                    </div>
                                     @if(Auth::check())
                                         <question-like question="{{$question->id}}"></question-like>
-                                    @else
-                                        <a class="answer-item-action question-like" href="/login">
-                                            <i class="fa fa-star fa-icon-sm"></i>收藏
+                                        <a class="answer-item-action question-like" href="{{url("/questions/{$question->id}/follow")}}">
+                                            <i class="fa fa-star fa-icon-sm"></i>关注
                                         </a>
                                     @endif
-                                    <div class="answer-item-action">
-                                        <i class="fa fa-ellipsis-h"></i>
-                                    </div>
 
                                     @if(Auth::check() && Auth::user()->owns($question))
                                         <div class="ui actio-buttons">
@@ -84,10 +78,10 @@
                                 <div class="media answer-item">
                                     <div class="media-body">
                                         <div class="answer-info-avatar">
-                                            <img src="{{url('/image/1.png')}}">
+                                            <img src="{{url("/image/{$answer->user->avatar}.png")}}">
                                         </div>
                                         <h4 class="media-heading answer-item-name">
-                                            <a href="/people/{{$answer->user->name}}">
+                                            <a href="{{url("/person/{$answer->user->name}")}}">
                                                 {{$answer->user->name}}
                                             </a>
                                         </h4>
@@ -108,13 +102,6 @@
                                                   model="{{$answer->id}}"
                                                   count="{{$answer->comments()->count()}}">
                                         </comments>
-                                        <div class="answer-item-action">
-                                            <i class="fa fa-paper-plane fa-icon-sm"></i>
-                                            分享
-                                        </div>
-                                        <div class="answer-item-action">
-                                            <i class="fa fa-ellipsis-h"></i>
-                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -139,12 +126,12 @@
                         <div class="media">
                             <div class="media-left">
                                 <a href="#">
-                                    <img width="36" src="{{url('/image/1.png')}}" alt="{{$question->user->name}}">
+                                    <img width="36" src="{{url("/image/{$question->user->avatar}.png")}}" alt="{{$question->user->name}}">
                                 </a>
                             </div>
                             <div class="media-body">
                                 <h4 class="media-heading">
-                                    <a href="/people/{{$question->user->name}}">
+                                    <a href="{{url("/person/{$question->user->name}")}}">
                                         {{$question->user->name}}
                                     </a>
                                 </h4>
@@ -161,12 +148,6 @@
                                     <div class="statics-text">回答</div>
                                     <div class="statics-count">
                                         {{$question->user->answers_count}}
-                                    </div>
-                                </div>
-                                <div class="statics-item text-center">
-                                    <div class="statics-text">关注者</div>
-                                    <div class="statics-count">
-                                        {{$question->user->followers_count}}
                                     </div>
                                 </div>
 

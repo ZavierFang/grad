@@ -1,26 +1,12 @@
 <?php
 
-/*
- * This file is part of the overtrue/laravel-ueditor.
- *
- * (c) overtrue <i@overtrue.me>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 return [
-    // 存储引擎: config/filesystem.php 中 disks， public 或 qiniu
-    'disk' => 'public',
+    // 存储引擎:filesystem.php 中 disks
+    'disk' => 'local',
+
     'route' => [
         'name' => '/ueditor/server',
-        'options' => [
-            // middleware => 'auth',
-        ],
     ],
-
-    // 是否使用 md5 格式文件名
-    'hash_filename' => true,
 
     // 上传 配置
     'upload' => [
@@ -105,7 +91,7 @@ return [
 
         /* 列出指定目录下的文件 */
         'fileManagerActionName' => 'list-file', /* 执行文件管理的action名称 */
-        'fileManagerListPath' => '/uploads/file/', /* 指定要列出文件的目录 */
+        'fileManagerListPath' => '/upload/file/', /* 指定要列出文件的目录 */
         'fileManagerUrlPrefix' => '', /* 文件访问路径前缀 */
         'fileManagerListSize' => 20, /* 每次列出文件数量 */
         'fileManagerAllowFiles' => [

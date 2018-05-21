@@ -1,18 +1,17 @@
 <?php
-
-/*
- * This file is part of the overtrue/laravel-ueditor.
+/**
+ * UEditorServiceProvider.php.
+ *
+ * This file is part of the laravel-ueditor.
  *
  * (c) overtrue <i@overtrue.me>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
 namespace Overtrue\LaravelUEditor;
 
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -53,7 +52,7 @@ class UEditorServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/config/ueditor.php', 'ueditor');
         $this->app->singleton('ueditor.storage', function ($app) {
-            return new StorageManager(Storage::disk($app['config']->get('ueditor.disk', 'public')));
+            return new StorageManager($app);
         });
     }
 
@@ -65,7 +64,7 @@ class UEditorServiceProvider extends ServiceProvider
     protected function registerRoute($router)
     {
         if (!$this->app->routesAreCached()) {
-            $router->group(array_merge(['namespace' => __NAMESPACE__], config('ueditor.route.options', [])), function ($router) {
+            $router->group(['namespace' => __NAMESPACE__], function ($router) {
                 $router->any(config('ueditor.route.name', '/ueditor/server'), 'UEditorController@serve');
             });
         }

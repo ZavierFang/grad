@@ -1,14 +1,14 @@
 <?php
-
-/*
- * This file is part of the overtrue/laravel-ueditor.
+/**
+ * UEditorController.php.
+ *
+ * This file is part of the laravel-ueditor.
  *
  * (c) overtrue <i@overtrue.me>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
 namespace Overtrue\LaravelUEditor;
 
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class UEditorController extends Controller
     public function serve(Request $request)
     {
         $upload = config('ueditor.upload');
-        $storage = app('ueditor.storage');
+        $storage = app()->make('ueditor.storage');
 
         switch ($request->get('action')) {
             case 'config':

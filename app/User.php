@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar', 'confirmation_token','api_token','setting','followers_count','followings_count',
+        'name', 'email', 'password', 'city','qq','sex','brief','avatar', 'confirmation_token','api_token','setting','followers_count','followings_count',
         'questions_count','comments_count','answers_count','likes_count'
     ];
 
@@ -29,6 +29,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $casts = [
+        'setting'=>'array'
+    ];
+
     //是否是本对象
     public function owns(Model $model){
         return $this->id==$model->user_id;
@@ -39,9 +43,38 @@ class User extends Authenticatable
         return $this->hasMany(Question::class);
     }
 
+    //用户--管理员
+    public function admin(){
+        return $this->hasOne(Admin::class);
+    }
+
+    public function isAdmin($id){
+        $result = Admin::where('user_id',$id)->get();
+        return !$result->isEmpty();
+    }
+
     //用户--答案
     public function answers(){
         return $this->hasMany(Answer::class);
     }
 
+    public function settings()
+    {
+        return new Setting($this);
+    }
+
+    //用户--问题--多对多
+    public function follow(){
+        return $this->belongsToMany(Question::class,'user_question')->withTimestamps();
+    }
+
+    //用户关注某个问题
+    public function followQuestion($questionId){
+        return $this->follow()->toggle($questionId);
+    }
+
+    //用户是否关注某个问题
+    public function followed($questionId){
+        return $this->follows()->where('question_id',$questionId)->count();
+    }
 }

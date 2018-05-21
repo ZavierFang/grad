@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -16,7 +17,6 @@
         <link href="//cdn.bootcss.com/font-awesome/4.6.0/css/font-awesome.css" rel="stylesheet">
         <link href="{{url('css/source/ionicons.min.css')}}" rel="stylesheet">
         <link rel="stylesheet" href="{{url('css/source/semantic.min.css')}}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
         <link rel="stylesheet" href="{{url('dist/css/AdminLTE.min.css')}}">
         <link rel="stylesheet" href="{{url('dist/css/_all-skins.min.css')}}">
     @show
@@ -63,7 +63,7 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="ask-question"><a class="ui button blue" href="{{ url('/questions/create') }}"><i class="fa fa-paint-brush fa-icon-lg"></i>新闻资讯</a></li>
+                        <li class="ask-question"><a class="ui button blue" href="{{ url('/news/index') }}"><i class="fa fa-paint-brush fa-icon-lg"></i>新闻资讯</a></li>
                         <li class="ask-question"><a class="ui button blue" href="{{ url('/questions/create') }}"><i class="fa fa-paint-brush fa-icon-lg"></i>发帖子</a></li>
                         <!-- Authentication Links -->
                         @if (Auth::guest())
@@ -77,10 +77,24 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
+                                        <a href="http://localhost:8080/grad/public/person/{{Auth::user()->name}}"><i class="fa fa-user fa-icon-lg"></i>个人主页</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{url("/setting/picture")}}"><i class="fa fa-cloud fa-icon-lg"></i>修改头像</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{url("/password")}}"><i class="fa fa-cog fa-icon-lg"></i>修改密码</a>
+                                    </li>
+                                    @if(Auth::user()->isAdmin(Auth::user()->id))
+                                        <li>
+                                            <a href="{{url("/admin")}}"> <i class="fa fa-coffee fa-icon-lg"></i>后台管理</a>
+                                        </li>
+                                    @endif
+                                    <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                            Logout
+                                            注销
                                         </a>
 
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -108,9 +122,9 @@
     <script type="text/javascript" src="{{ asset('vendor/ueditor/ueditor.config.js') }}"></script>
     <!-- 编辑器源码文件 -->
     <script type="text/javascript" src="{{ asset('vendor/ueditor/ueditor.all.js') }}"></script>
-    <script>
-        window.UEDITOR_CONFIG.serverUrl = '{{ config('ueditor.route.name') }}'
-    </script>
+    {{--<script>--}}
+        {{--window.UEDITOR_CONFIG.serverUrl = '{{ config('ueditor.route.name') }}'--}}
+    {{--</script>--}}
 
     @yield('js')
 </body>

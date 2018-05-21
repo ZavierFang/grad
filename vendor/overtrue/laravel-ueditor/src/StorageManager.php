@@ -1,45 +1,25 @@
 <?php
-
-/*
- * This file is part of the overtrue/laravel-ueditor.
+/**
+ * StorageManager.php.
+ *
+ * This file is part of the laravel-ueditor.
  *
  * (c) overtrue <i@overtrue.me>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
 namespace Overtrue\LaravelUEditor;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Overtrue\LaravelUEditor\Events\Uploaded;
-use Overtrue\LaravelUEditor\Events\Uploading;
+use Illuminate\Support\Manager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Class StorageManager.
  */
-class StorageManager
+class StorageManager extends Manager
 {
-    use UrlResolverTrait;
-
-    /**
-     * @var \Illuminate\Contracts\Filesystem\Filesystem
-     */
-    protected $disk;
-
-    /**
-     * Constructor.
-     *
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $disk
-     */
-    public function __construct(Filesystem $disk)
-    {
-        $this->disk = $disk;
-    }
-
     /**
      * Upload a file.
      *
@@ -63,13 +43,6 @@ class StorageManager
 
         $filename = $this->getFilename($file, $config);
 
-        if ($this->eventSupport()) {
-            $modifiedFilename = event(new Uploading($file, $filename, $config), [], true);
-            $filename = !is_null($modifiedFilename) ? $modifiedFilename : $filename;
-        }
-
-        $this->store($file, $filename);
-
         $response = [
             'state' => 'SUCCESS',
             'url' => $this->getUrl($filename),
@@ -79,19 +52,13 @@ class StorageManager
             'size' => $file->getSize(),
         ];
 
-        if ($this->eventSupport()) {
-            event(new Uploaded($file, $response));
+        try {
+            $this->store($file, $filename);
+        } catch (StoreErrorException $e) {
+            return $this->error($e->getMessage());
         }
 
         return response()->json($response);
-    }
-
-    /**
-     * @return bool
-     */
-    public function eventSupport()
-    {
-        return trait_exists('Illuminate\Foundation\Events\Dispatchable');
     }
 
     /**
@@ -106,47 +73,44 @@ class StorageManager
      */
     public function listFiles($path, $start, $size = 20, array $allowFiles = [])
     {
-        $allFiles = $this->disk->listContents($path, true);
-        $files = $this->paginateFiles($allFiles, $start, $size);
+        $files = $this->lists($path, $start, $size, $allowFiles);
 
         return [
-            'state' => empty($files) ? 'EMPTY' : 'SUCCESS',
+            'state' => empty($files) ? 'no match file' : 'SUCCESS',
             'list' => $files,
             'start' => $start,
-            'total' => count($allFiles),
+            'total' => count($files),
         ];
     }
 
     /**
-     * Split results.
+     * Return default driver name.
      *
-     * @param array $files
-     * @param int   $start
-     * @param int   $size
-     *
-     * @return array
+     * @return string
      */
-    protected function paginateFiles(array $files, $start = 0, $size = 50)
+    public function getDefaultDriver()
     {
-        return collect($files)->where('type', 'file')->splice($start)->take($size)->map(function ($file) {
-            return [
-                'url' => $this->getUrl($file['path']),
-                'mtime' => $file['timestamp'],
-            ];
-        })->all();
+        return 'local';
     }
 
     /**
-     * Store file.
+     * Get the default driver name.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
-     * @param string                                              $filename
-     *
-     * @return mixed
+     * @return string
      */
-    protected function store(UploadedFile $file, $filename)
+    public function createLocalDriver()
     {
-        return $this->disk->put($filename, fopen($file->getRealPath(), 'r+'));
+        return new LocalStorage($this);
+    }
+
+    /**
+     * Make qiniu storage.
+     *
+     * @return \Overtrue\LaravelUEditor\QiNiuStorage
+     */
+    public function createQiniuDriver()
+    {
+        return new QiNiuStorage($this);
     }
 
     /**
@@ -157,7 +121,7 @@ class StorageManager
      *
      * @return bool|string
      */
-    protected function fileHasError(UploadedFile $file, array $config)
+    public function fileHasError(UploadedFile $file, array $config)
     {
         $error = false;
 
@@ -166,8 +130,8 @@ class StorageManager
         } elseif ($file->getSize() > $config['max_size']) {
             $error = 'upload.ERROR_SIZE_EXCEED';
         } elseif (!empty($config['allow_files']) &&
-            !in_array('.'.$file->getClientOriginalExtension(), $config['allow_files'])) {
-            $error = 'upload.ERROR_TYPE_NOT_ALLOWED';
+            !in_array('.'.$file->guessExtension(), $config['allow_files'])) {
+            $error = 'ERROR_TYPE_NOT_ALLOWED';
         }
 
         return $error;
@@ -183,11 +147,9 @@ class StorageManager
      */
     protected function getFilename(UploadedFile $file, array $config)
     {
-        $ext = '.'.$file->getClientOriginalExtension();
+        $ext = '.'.($file->getClientOriginalExtension() ?: $file->guessClientExtension());
 
-        $filename = config('ueditor.hash_filename') ? md5($file->getFilename()).$ext : $file->getClientOriginalName();
-
-        return $this->formatPath($config['path_format'], $filename);
+        return str_finish($this->formatPath($config['path_format']), '/').md5($file->getFilename()).$ext;
     }
 
     /**
@@ -197,7 +159,7 @@ class StorageManager
      *
      * @return array
      */
-    protected function getUploadConfig($action)
+    public function getUploadConfig($action)
     {
         $upload = config('ueditor.upload');
 
@@ -217,7 +179,6 @@ class StorageManager
                     'allow_files' => array_get($upload, $prefix.'AllowFiles', []),
                     'path_format' => array_get($upload, $prefix.'PathFormat'),
                 ];
-
                 break;
             }
         }
@@ -241,24 +202,21 @@ class StorageManager
      * Format the storage path.
      *
      * @param string $path
-     * @param string $filename
      *
      * @return mixed
      */
-    protected function formatPath($path, $filename)
+    public function formatPath($path)
     {
-        $replacement = array_merge(explode('-', date('Y-y-m-d-H-i-s')), [$filename, time()]);
-        $placeholders = ['{yyyy}', '{yy}', '{mm}', '{dd}', '{hh}', '{ii}', '{ss}', '{filename}', '{time}'];
-        $path = str_replace($placeholders, $replacement, $path);
+        $time = time();
+        $partials = explode('-', date('Y-y-m-d-H-i-s'));
+        $replacement = ['{yyyy}','{yy}', '{mm}', '{dd}', '{hh}', '{ii}', '{ss}'];
+        $path = str_replace($replacement, $partials, $path);
+        $path = str_replace('{time}', $time, $path);
 
         //替换随机字符串
-        if (preg_match('/\{rand\:([\d]*)\}/i', $path, $matches)) {
-            $length = min($matches[1], strlen(PHP_INT_MAX));
-            $path = preg_replace('/\{rand\:[\d]*\}/i', str_pad(mt_rand(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT), $path);
-        }
-
-        if (!str_contains($path, $filename)) {
-            $path = str_finish($path, '/').$filename;
+        $randNum = rand(1, 10000000000).rand(1, 10000000000);
+        if (preg_match("/\{rand\:([\d]*)\}/i", $path, $matches)) {
+            $path = preg_replace("/\{rand\:[\d]*\}/i", substr($randNum, 0, $matches[1]), $path);
         }
 
         return $path;

@@ -7,14 +7,15 @@
     <meta id="token" name="token" value="{{csrf_token()}}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    @section('header-css')
     <link href="//cdn.bootcss.com/font-awesome/4.6.0/css/font-awesome.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{url('css/source/semantic.min.css')}}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="{{url('dist/css/AdminLTE.min.css')}}">
     <link rel="stylesheet" href="{{url('dist/css/_all-skins.min.css')}}">
-    @show
+
+    <script src="{{url('dist/js/app.min.js')}}"></script>
+    <script src="{{url('js/demo.js')}}"></script>
+
 
     @section('other-css')
     @show
@@ -41,9 +42,6 @@
         </section>
     </div>
 
-    {{--底部--}}
-    @section('main-footer')
-    @show
 
     {{--右边导航--}}
     @section('control-sidebar')
@@ -55,7 +53,7 @@
         <script src="//cdn.bootcss.com/vue/2.0.0-rc.5/vue.min.js"></script>
         <script src="https://cdn.jsdelivr.net/vue.resource/1.0.2/vue-resource.min.js"></script>
         <script src="{{url('dist/js/app.min.js')}}"></script>
-        <script src="{{url('dist/js/demo.js')}}"></script>
+        <script src="{{url('js/demo.js')}}"></script>
     @show
 
     {{--额外Js依赖--}}

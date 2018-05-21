@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the overtrue/laravel-ueditor.
- *
- * (c) overtrue <i@overtrue.me>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 return [
     UPLOAD_ERR_INI_SIZE => '文件大小超出php.ini中MAX_FILE_SIZE限制',
     UPLOAD_ERR_FORM_SIZE => '文件大小超出表单中MAX_FILE_SIZE限制',
